@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+
+  postgresql:
+    image: registry.gitlab.com/tudonovo/bd
+    networks:
+        - tudonovo-network-dev
+    volumes:
+      - /var/lib/postgresql/data:/var/lib/postgresql/data
+    command: postgres -c 'shared_buffers=256MB' -c 'max_connections=250'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres 
+    ports:
+       - "5432:5432"
+  web:
+    image:  registry.gitlab.com/tudonovo/core:latest
+    networks:
+        - tudonovo-network-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+      SPRING_JPA_SHOW-SQL: 'false'
+      SPRING_DATASOURCE_TOMCAT_MAX-ACTIVE: 5
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresql
+
+networks: 
+    tudonovo-network-dev:
+      external: true   
